@@ -1,0 +1,9 @@
+{
+    "name": "proxy-server",
+    "description": "Proxy server",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "http-proxy": "0.x.x"
+    }
+}
