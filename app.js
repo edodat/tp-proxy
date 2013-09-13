@@ -25,6 +25,10 @@ var options = {
 };
 
 var routingTable = {
+    'www.tp.com': {
+        host: 'localhost',
+        port: 8000
+    },
     'api.tp.com': {
         host: 'localhost',
         port: 8081
@@ -32,14 +36,19 @@ var routingTable = {
     'app.tp.com':{
         host: 'localhost',
         port: 8080
+    },
+    'io.tp.com':{
+        host: 'localhost',
+        port: 8083
     }
 };
 
 var customHandler = function (req, res, proxy){
-    if (req.headers.host) {
-        proxy.proxyRequest(req, res, routingTable[req.headers.host]);
+    var hostname = req.headers.host.split(':')[0];
+    if (routingTable[hostname]) {
+        proxy.proxyRequest(req, res, routingTable[hostname]);
     } else {
-        res.send(401);
+        res.send(404, 'Server not found');
     }
 
 };
@@ -50,5 +59,5 @@ var customHandler = function (req, res, proxy){
 
 var proxyServer = httpProxy.createServer(options, customHandler);
 proxyServer.listen(process.env.PORT || 443, function(){
-    console.log('Proxy server listening on port ' + proxyServer.address().port);
+    console.log('Proxy HTTPS server listening on port ' + proxyServer.address().port);
 });
