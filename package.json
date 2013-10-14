@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
-        "http-proxy": "0.x.x"
+        "http-proxy": "0.x.x",
+        "amqp": "0.x.x"
     }
 }
