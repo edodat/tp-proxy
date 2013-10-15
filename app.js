@@ -12,6 +12,9 @@
 var httpProxy = require('http-proxy')
     fs = require('fs');
 
+var bus = require('./controllers/bus.js');
+
+var controllers = require('./controllers');
 
 ///////////////////
 // CONFIGURATION //
@@ -24,40 +27,25 @@ var options = {
     }
 };
 
-var routingTable = {
-    'www.tp.com': {
-        host: 'localhost',
-        port: 8000
-    },
-    'api.tp.com': {
-        host: 'localhost',
-        port: 8081
-    },
-    'app.tp.com':{
-        host: 'localhost',
-        port: 8080
-    },
-    'io.tp.com':{
-        host: 'localhost',
-        port: 8083
-    }
-};
+///////////////////////////
+// SERVICE BUS LISTENERS //
+///////////////////////////
 
-var customHandler = function (req, res, proxy){
-    var hostname = req.headers.host.split(':')[0];
-    if (routingTable[hostname]) {
-        proxy.proxyRequest(req, res, routingTable[hostname]);
-    } else {
-        res.send(404, 'Server not found');
-    }
+bus.initialize(function(){
 
-};
+    bus.on('agent.company', controllers.routes.onAgentCompany);
+//    bus.on('agent.shutdown', controllers.routes.onAgentShutdown);
+
+    bus.discover();
+});
+
 
 //////////////////
 // START SERVER //
 //////////////////
 
-var proxyServer = httpProxy.createServer(options, customHandler);
+var proxyServer = httpProxy.createServer(options, controllers.routes.processRequest);
+
 proxyServer.listen(process.env.PORT || 443, function(){
     console.log('Proxy HTTPS server listening on port ' + proxyServer.address().port);
 });
