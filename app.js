@@ -34,7 +34,7 @@ var options = {
 bus.initialize(function(){
 
     bus.on('agent.company', controllers.routes.onAgentCompany);
-//    bus.on('agent.shutdown', controllers.routes.onAgentShutdown);
+    bus.on('agent.shutdown', controllers.routes.onAgentShutdown);
 
     bus.discover();
 });

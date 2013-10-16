@@ -101,3 +101,10 @@ module.exports.discover = function(){
     publish('proxy.discover', {  });
 };
 
+/**
+ * Publishes a message to instruct server to run API instance
+ */
+module.exports.publishRun = function(host, companyKey){
+    publish('proxy.run', { host: host, company: companyKey });
+};
+
