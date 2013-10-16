@@ -9,33 +9,19 @@
 // INITIALIZATION //
 ////////////////////
 
+var network = require('../config/network.js');
+
 var bus = require('./bus.js');
 
 /////////////
 // PRIVATE //
 /////////////
 
-var routingTable = {
-    'www.tp.com': {
-        type: 'www',
-        host: 'localhost',
-        port: 8000,
-        status: 'active'
-    },
-    'io.tp.com':{
-        type: 'io',
-        host: 'localhost',
-        port: 8083,
-        status: 'active'
-    }
-};
-
-function getSubdomain(type, companyKey){
-    return companyKey+'.'+type+'.tp.com';
-}
+// Hashmap to store proxy routes ( hostname => {type, company, host, port, status} )
+var routingTable = {};
 
 function saveRoute(type, companyKey, host ,port, status){
-    var subdomain = getSubdomain(type, companyKey);
+    var subdomain = network.getSubdomain(type, companyKey);
     var route = {
         type: type,
         company: companyKey,
@@ -48,7 +34,7 @@ function saveRoute(type, companyKey, host ,port, status){
 }
 
 function removeRoute(type, companyKey){
-    var subdomain = getSubdomain(type, companyKey);
+    var subdomain = network.getSubdomain(type, companyKey);
     delete routingTable[subdomain];
     console.log('[PROXY] Removed route for subdomain', subdomain);
 }
@@ -65,6 +51,14 @@ function removeRoutes(type, host){
 ////////////
 // PUBLIC //
 ////////////
+
+/**
+ * Initializes proxy default routes.
+ */
+module.exports.initialize = function(){
+    saveRoute('www', null, network.WWW.HOST, network.WWW.PORT, 'active');
+    saveRoute('io', null, network.IO.HOST, network.IO.PORT, 'active');
+};
 
 /**
  * Custom handler to process incoming request.
@@ -84,7 +78,6 @@ module.exports.processRequest = function (req, res, proxy){
     // standby route
     } else if (routingTable[hostname] && routingTable[hostname].status == 'standby') {
         bus.publishRun(routingTable[hostname].host, routingTable[hostname].company);
-        //TODO "success" 202 (Accepted) or "error" 504 (Gateway Timeout) ?
         res.writeHead(504, {"Content-Type": "text/plain"});
         res.write('Instance starting...');
         res.end();
@@ -102,7 +95,7 @@ module.exports.processRequest = function (req, res, proxy){
  */
 module.exports.onAgentCompany = function(message){
     // route to 'app' is always active
-    saveRoute('app', message.company, 'localhost', 8080, 'active');
+    saveRoute('app', message.company, network.APP.HOST, network.APP.PORT, 'active');
 
     // route to 'api' depends on agent status
     var status = (message.status == 'running') ? 'active' : 'standby';

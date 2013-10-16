@@ -44,6 +44,8 @@ bus.initialize(function(){
 // START SERVER //
 //////////////////
 
+controllers.routes.initialize();
+
 var proxyServer = httpProxy.createServer(options, controllers.routes.processRequest);
 
 proxyServer.listen(process.env.PORT || 443, function(){
