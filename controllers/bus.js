@@ -17,7 +17,7 @@ var amqp = require('amqp'),
 /////////////
 
 var connection;
-var agentsExchange;
+var adminExchange;
 var queue;
 var listeners = {};
 
@@ -31,13 +31,13 @@ function initialize (callback){
     connection.on('ready', function() {
         console.log('[BUS] Connected to ' + connection.serverProperties.product);
 
-        // declare "agents" AMQP exchange
-        agentsExchange = connection.exchange('agents', {
+        // declare "administration" AMQP exchange
+        adminExchange = connection.exchange('administration', {
             type: 'topic',
             durable: 'true'
         });
 
-        // declare administration queue (named with agent hostname)
+        // declare proxy queue
         queue = connection.queue('proxy', function(q){
             // Receive messages
             q.subscribe(function (message, headers, deliveryInfo) {
@@ -62,7 +62,7 @@ function initialize (callback){
  */
 function publish (routingKey, message){
     console.log('[BUS] Publishing', routingKey, 'message:', message);
-    agentsExchange.publish(routingKey, message);
+    adminExchange.publish(routingKey, message);
 }
 
 ////////////
@@ -88,7 +88,7 @@ module.exports.close = function(){
  * @param callback
  */
 module.exports.on = function (routingKey, callback){
-    queue.bind(agentsExchange, routingKey);
+    queue.bind(adminExchange, routingKey);
     listeners[routingKey] = callback;
     console.log('[BUS] Listening to', routingKey, 'messages');
 }
