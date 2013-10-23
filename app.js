@@ -9,7 +9,7 @@
 // INITIALIZATION //
 ////////////////////
 
-var httpProxy = require('http-proxy')
+var httpProxy = require('http-proxy'),
     fs = require('fs');
 
 var bus = require('./controllers/bus.js');

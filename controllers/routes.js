@@ -9,6 +9,8 @@
 // INITIALIZATION //
 ////////////////////
 
+var fs = require('fs');
+
 var network = require('../config/network.js');
 
 var bus = require('./bus.js');
@@ -48,6 +50,11 @@ function removeRoutes(type, host){
     }
 }
 
+function isXHR(req){
+    var val = req.headers['X-Requested-With'] || req.headers['x-requested-with'] || '';
+    return 'xmlhttprequest' == val.toLowerCase();
+}
+
 ////////////
 // PUBLIC //
 ////////////
@@ -78,9 +85,25 @@ module.exports.processRequest = function (req, res, proxy){
     // standby route
     } else if (routingTable[hostname] && routingTable[hostname].status == 'standby') {
         bus.publishRun(routingTable[hostname].host, routingTable[hostname].company);
-        res.writeHead(504, {"Content-Type": "text/plain"});
-        res.write('Instance starting...');
-        res.end();
+        if (isXHR(req)) {
+            res.writeHead(504, {"Content-Type": "text/plain"});
+            res.write('Instance starting...');
+            res.end();
+        } else {
+            var view = __dirname+'/../public/starting.html';
+            fs.readFile(view, function(err, html) {
+                if(err) {
+                    console.log('[PROXY] Error : Cannot access file', view);
+                    res.writeHead(200, {"Content-Type": "text/html"});
+                    res.write('<h1>Your private instance is starting. Please retry in a few moments..</h1>');
+                    res.end();
+                    return;
+                }
+                res.writeHead(200, {"Content-Type": "text/html"});
+                res.write(html);
+                res.end();
+            });
+        }
 
     // unknown route
     } else {

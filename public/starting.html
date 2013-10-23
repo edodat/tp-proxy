@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Instance starting...</title>
+
+    <!-- Bootstrap -->
+    <!--<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.no-icons.min.css" rel="stylesheet" media="screen">-->
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet" media="screen">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- Note: Local versions in "/vendor/bootstrap/assets/js/" -->
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom styles -->
+    <style type="text/css">
+    </style>
+
+</head>
+<body>
+
+<!-- Site content -->
+<div class="container">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="text-center text-success"><i class="icon-power-off"></i> Your private instance is starting</h3>
+        </div>
+        <div class="modal-body">
+            <h3 class="text-center">You will be automatically connected in a few seconds...</h3>
+            <h1 class="text-center"><i class="icon-spinner icon-spin"></i></h1>
+        </div>
+    </div>
+</div>
+
+<!-- Placed at the end of the document so the pages load faster -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Bootstrap -->
+<!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>-->
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+
+<!-- Angular -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+
+
+<!-- Custom Javascript -->
+<script type="text/javascript">
+    angular.module('app', [])
+    .run(function($timeout, $http, $window){
+        // Ping APP every second. Once connected, reload page.
+        var INTERVAL = 1000;
+        function pingApp() {
+            $http({method: 'GET', url: '/api/ping'})
+                .success(function() {
+                        $window.location.reload();
+                    })
+                .error(function(data, status) {
+                    if (status == 504) {
+                        $timeout(function(){
+                            pingApp();
+                        }, INTERVAL);
+                    } else {
+                        $window.location.reload();
+                    }
+                }
+            );
+        }
+        pingApp();
+    });
+</script>
+
+</body>
+</html>
