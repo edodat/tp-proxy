@@ -102,7 +102,7 @@ module.exports.discover = function(){
 };
 
 /**
- * Publishes a message to instruct server to run API instance
+ * Publishes a message to instruct server to run APP instance
  */
 module.exports.publishRun = function(host, companyKey){
     publish('proxy.run', { host: host, company: companyKey });

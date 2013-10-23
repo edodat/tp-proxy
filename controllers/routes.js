@@ -91,20 +91,17 @@ module.exports.processRequest = function (req, res, proxy){
 };
 
 /**
- * Listener called when an API agent sends info for a company.
+ * Listener called when an APP agent sends info for a company.
  */
 module.exports.onAgentCompany = function(message){
-    // route to 'app' is always active
-    saveRoute('app', message.company, network.APP.HOST, network.APP.PORT, 'active');
-
-    // route to 'api' depends on agent status
+    // route to 'app' depends on agent status
     var status = (message.status == 'running') ? 'active' : 'standby';
-    saveRoute('api', message.company, message.host, message.port, status);
+    saveRoute('app', message.company, message.host, message.port, status);
 };
 
 /**
- * Listener called when an API agent shuts down.
+ * Listener called when an APP agent shuts down.
  */
 module.exports.onAgentShutdown = function(message){
-    removeRoutes('api', message.host);
+    removeRoutes('app', message.host);
 };

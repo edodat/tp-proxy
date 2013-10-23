@@ -10,8 +10,7 @@ module.exports.DOMAIN_NAME = 'tp.com';
 module.exports.SUBDOMAIN = {
     www:    'www',
     io:     'io',
-    app:    'app',
-    api:    'api'
+    app:    'app'
 };
 
 module.exports.WWW = {
@@ -22,11 +21,6 @@ module.exports.WWW = {
 module.exports.IO = {
     HOST: 'localhost',
     PORT: 8083
-};
-
-module.exports.APP = {
-    HOST: 'localhost',
-    PORT: 8080
 };
 
 
