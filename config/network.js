@@ -5,7 +5,7 @@
  * Date: 16/10/13
  */
 
-module.exports.DOMAIN_NAME = 'tp.com';
+module.exports.DOMAIN_NAME = 'lean-project.com';
 
 module.exports.SUBDOMAIN = {
     www:    'www',
