@@ -9,7 +9,8 @@
 // INITIALIZATION //
 ////////////////////
 
-var httpProxy = require('http-proxy'),
+var http = require('http'),
+    httpProxy = require('http-proxy'),
     fs = require('fs');
 
 var bus = require('./controllers/bus.js');
@@ -40,14 +41,29 @@ bus.initialize(function(){
 });
 
 
-//////////////////
-// START SERVER //
-//////////////////
+////////////////////////
+// START HTTPS SERVER //
+////////////////////////
 
 controllers.routes.initialize();
 
 var proxyServer = httpProxy.createServer(options, controllers.routes.processRequest);
 
-proxyServer.listen(process.env.PORT || 443, function(){
+proxyServer.listen(process.env.SECUREPORT || 443, function(){
     console.log('Proxy HTTPS server listening on port ' + proxyServer.address().port);
+});
+
+////////////////////////////
+// HTTP -> HTTPS REDIRECT //
+////////////////////////////
+
+var httpServer = http.createServer(function (req, res) {
+    res.writeHead(301,
+        { Location: 'https://' + req.headers.host + req.url }
+    );
+    res.end();
+});
+
+httpServer.listen(process.env.PORT || 80, function(){
+    console.log('Proxy HTTP redirection server listening on port ' + httpServer.address().port);
 });
